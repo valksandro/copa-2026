@@ -1,6 +1,5 @@
 'use client'
 
-import { Countdown } from '@/components/effects/Countdown'
 import { Trophy3D } from '@/components/effects/Visual'
 
 export function Hero() {
@@ -54,14 +53,6 @@ export function Hero() {
         {/* Troféu */}
         <div className="flex justify-center mb-10 animate-scale-in" style={{ animationDelay: '0.4s' }}>
           <Trophy3D />
-        </div>
-
-        {/* Contagem regressiva */}
-        <div className="mb-10 animate-fade-up" style={{ animationDelay: '0.5s' }}>
-          <div className="text-sm uppercase tracking-widest text-amber-300 mb-4 font-bold">
-            ⏱ Faltam para a abertura no Estádio Azteca
-          </div>
-          <Countdown />
         </div>
 
         {/* CTAs */}
