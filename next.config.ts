@@ -12,7 +12,11 @@ import type { NextConfig } from "next";
 //
 // - Se for publicado em domínio próprio (user.github.io) ou com GitHub Pages
 //   na raiz do domínio (custom domain), use basePath: ""
-const repoName = "copa-2026";
+//
+// O nome do repositório é derivado automaticamente de GITHUB_REPOSITORY
+// (definido pelo GitHub Actions como "owner/repo"), então o mesmo código
+// funciona em qualquer repo — ex.: valksandro/copa-2026 e Phanttro/copa2026.
+const repoName = process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "copa-2026";
 
 const nextConfig: NextConfig = {
   output: "export",
