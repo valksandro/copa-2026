@@ -1,0 +1,75 @@
+# Workflow para deploy automático no GitHub Pages
+# Quando você fizer `git push` para a branch `main`, o site será
+# construído e publicado automaticamente em https://SEU_USUARIO.github.io/copa-2026/
+
+name: 🚀 Deploy no GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # permite rodar manualmente pela aba Actions
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Permite apenas 1 deploy por vez, mas não cancela builds em progresso
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: 📦 Build do site
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Alternative: use Node.js if you prefer
+      # - name: 🟢 Setup Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 20
+      #     cache: 'npm'
+
+      - name: 📥 Instalar dependências
+        run: bun install --frozen-lockfile
+        # ou com npm: npm ci
+
+      - name: 🏗️ Build (Next.js static export)
+        run: bun run build
+        # ou com npm: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: 📄 Criar .nojekyll
+        # Impede o Jekyll do GitHub Pages de processar _next
+        run: touch ./out/.nojekyll
+
+      - name: 📤 Criar página 404
+        # GitHub Pages usa 404.html na raiz
+        run: cp ./out/404.html ./out/404.html 2>/dev/null || echo "Página 404 já gerada"
+
+      - name: 📦 Upload dos artefatos
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    name: 🚀 Publicar no GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 🚀 Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
